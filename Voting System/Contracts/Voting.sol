@@ -83,7 +83,7 @@ contract Voting{
         }
     }
 
-    // The function to send the votes
+    // The function to view the resluts of a particular party
     function viewResultsOf(int partyNumber) public view onlyAfterCountingVotes returns(int){
         return partyVotes[partyNumber];
     }
