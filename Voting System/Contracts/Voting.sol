@@ -33,8 +33,9 @@ contract Voting{
     }
 
     // The modifier that allows only one voter to vote at a time
-    modifier allowOneVoterOnly() {
+    modifier allowVoting() {
         require(!isVoterVoting,"Some one else is voting. Please wait and try again.");
+        require(countingTime >= block.timestamp, "You can not vote now. The voting has been compleated.");
         isVoterVoting = true;
         _;
         isVoterVoting = false;
@@ -62,7 +63,7 @@ contract Voting{
     }
 
     // The function to vote by the voters
-    function vote(string memory voterId, int partyNumber) public allowOneVoterOnly {
+    function vote(string memory voterId, int partyNumber) public allowVoting {
         bytes32 userId = sha256(abi.encodePacked(voterId));
         require(votersExists[userId], "This voter is not atunticated by the election commission.");
         require(!hasVoted[userId], "This voter has already voted.");
