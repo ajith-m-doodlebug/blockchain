@@ -11,7 +11,7 @@ contract ErrorHandling{
     }
 
     function errorRevert() public view  {
-        if(numberOne > numberTwo){
+        if(numberOne < numberTwo){
             revert("The number one should be greater than number two.");
         }
     }
