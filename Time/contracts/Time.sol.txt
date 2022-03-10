@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
+
+contract Time{
+
+    uint public deployedTime;
+
+    constructor(uint _deployedTime){
+        deployedTime = _deployedTime;
+    }
+
+    function getCurrentTime()public view returns(uint){
+        return block.timestamp;
+    }
+
+}
