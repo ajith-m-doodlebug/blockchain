@@ -9,20 +9,19 @@ contract Voting{
     uint public endTime;
 
     bytes32 [] public voters;
-
-    int [] public votes;
+    mapping(bytes32 => bool) votersExists;
 
     bool internal isVoterVoting;
-
-    bool internal isVotesCounted;
-
-    mapping(bytes32 => bool) votersExists;
+    
+    int [] public votes;
     mapping(bytes32 => bool) hasVoted;
 
     mapping(int => int) partyVotes;
+    
+    bool internal isVotesCounted;
 
-    // The constructor to save the address of the commission
-    constructor(uint _startTime, unit _endTime){
+    // The constructor to save the address of the election commission, start time and end tine.
+    constructor(uint _startTime, uint _endTime){
         commission = msg.sender;
         startTime = _startTime;
         endTime = _endTime;
