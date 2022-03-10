@@ -5,7 +5,8 @@ contract Voting{
 
     address public commission;
 
-    uint public countingTime;
+    uint public startTime;
+    uint public endTime;
 
     bytes32 [] public voters;
 
@@ -21,9 +22,10 @@ contract Voting{
     mapping(int => int) partyVotes;
 
     // The constructor to save the address of the commission
-    constructor(uint startCountingTime){
+    constructor(uint _startTime, uint _endTime){
         commission = msg.sender;
-        countingTime = startCountingTime;
+        startTime = _startTime;
+        endTime = _endTime;
     }
 
     // The modifier that allows only the election commission to access the functions
@@ -34,8 +36,9 @@ contract Voting{
 
     // The modifier that allows only one voter to vote at a time
     modifier allowVoting() {
+        require(startTime <= block.timestamp, "You can not vote now. The voting has not started yet.");
+        require(endTime >= block.timestamp, "You can not vote now. The voting has been compleated.");
         require(!isVoterVoting,"Some one else is voting. Please wait and try again.");
-        require(countingTime >= block.timestamp, "You can not vote now. The voting has been compleated.");
         isVoterVoting = true;
         _;
         isVoterVoting = false;
@@ -43,7 +46,7 @@ contract Voting{
 
     // The modifier that allows to count vote only after the specific time
     modifier onlyAfterCountingTime() {
-        require(countingTime <= block.timestamp, "Counting can not be started now.");
+        require(endTime <= block.timestamp, "Counting can not be started now.");
         isVotesCounted = true;
         _;
     }
