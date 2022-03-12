@@ -15,10 +15,10 @@ contract Voting{
     
     int [] public votes;
     mapping(bytes32 => bool) hasVoted;
-
-    mapping(int => int) partyVotes;
     
     bool internal isVotesCounted;
+    
+    mapping(int => int) partyVotes;
 
     // The constructor to save the address of the election commission, start time and end tine.
     constructor(uint _startTime, uint _endTime){
