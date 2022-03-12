@@ -43,8 +43,8 @@ contract Voting{
         isVoterVoting = false;
     }
 
-    // The modifier that allows to count vote only after the specific time
-    modifier onlyAfterCountingTime() {
+    // The modifier that allows to count vote only after the end time
+    modifier onlyAfterEndTime() {
         require(endTime <= block.timestamp, "Counting can not be started now.");
         isVotesCounted = true;
         _;
@@ -73,8 +73,8 @@ contract Voting{
         votes.push(partyNumber);
     }
     
-    // The function to count the number of votes
-    function countVotes() public onlyAfterCountingTime{
+    // The function to count the number of votes secured by each party
+    function countVotes() public onlyAfterEndTime{
         uint indexVotes = 0;
         uint numberOfVotes = votes.length;
         while (numberOfVotes != 0) {
