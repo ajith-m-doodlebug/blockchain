@@ -33,7 +33,7 @@ contract Voting{
         _;
     }
 
-    // The modifier that allows only one voter to vote at a time
+    // The modifier that allows only the voters to vote between the start time and the end time. It also allows only one voter to vote at a time.
     modifier allowVoting() {
         require(startTime <= block.timestamp, "You can not vote now. The voting has not started yet.");
         require(endTime >= block.timestamp, "You can not vote now. The voting has been compleated.");
