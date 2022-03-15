@@ -72,17 +72,17 @@ contract KYC{
     }
 
     // The function to get the documents for the institution.
-    function getDocumentsForinstitution(address _userId) public returns(string [] memory){
+    function getDocumentsForinstitution(address _userId) public view returns(string [] memory){
         return indexedUsers[_userId].documents;
     }
 
     
     // The function check if the user is approved or not.
-    function checkIsUserApproved(address _userId){
+    function checkIsUserApproved(address _userId) public view returns(bool){
         return indexedUsers[_userId].isApproved;
     }
 
-    // The function to verify the documents, if the user is not approved. 
+    // The function to verify the documents, if the user is not approved (false). 
     function institutionVerifiesDocuments(address _userId, bytes32 _uprovedHash) public {
             if(indexedUsers[_userId].documentHash == _uprovedHash){
                 indexedUsers[_userId].uprovedHash = _uprovedHash;
@@ -95,17 +95,14 @@ contract KYC{
     }
 
 
-    // The function to verify the hashs, if the user is approved. 
+    // The function to verify the hashs, if the user is approved (true). 
     function institutionVerifiesHashs(address _userId) public returns(bool){
             if(indexedUsers[_userId].documentHash == indexedUsers[_userId].uprovedHash){
                 return true;
             }else{
                 indexedUsers[_userId].isApproved = false;
                 return false;
-                revert("The documents have been updated.");
             }
     }
-
-
 
 }
