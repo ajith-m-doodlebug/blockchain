@@ -6,13 +6,14 @@ contract KYC {
     struct User {
         address id; // The unique address of the user.
         string name; // The name of the user.
-        string[] documents; // The url/location of the documents stored in a database.
+        string documentsLocation; // The url/location of the documents stored in a database.
         bytes32 documentHash; // The hash of the uploaded documents.
         bool isDocumentsAvailable; // The boolian variable to check if there are documents available or not.
         FinancialInstitution submitedInstitution; // The institution to whihc the documents have been submited.
         bool isDocumentsSubmited; // The boolian variable to check if the documents are submited to verify or not.
         bytes32 uprovedHash; // The hash that is uploaded by the instituion after verifying.
         bool isApproved; // The boolian variable to check if the documents are approved or not.
+        bool isHashsVerified; // The boolian variable to check if the document hash and uproved hash are same.
     }
 
     // The structure of a financial institution.
@@ -95,11 +96,11 @@ contract KYC {
 
     // The function to upload / update documens by the user. [The list of document urls and the document hash]  (only user)
     function userUploadDocuments(
-        string[] memory _documents,
+        string memory _documentsLocation,
         bytes32 _documentHash
     ) public onlyUser {
         address userId = msg.sender;
-        indexedUsers[userId].documents = _documents;
+        indexedUsers[userId].documentsLocation = _documentsLocation;
         indexedUsers[userId].documentHash = _documentHash;
         indexedUsers[userId].isDocumentsAvailable = true;
     }
@@ -108,7 +109,7 @@ contract KYC {
     function userSubmitsToInstitution(address _institutionId) public onlyUser {
         address userId = msg.sender;
         require(
-            indexedUsers[userId].isDocumentsSubmited,
+            !indexedUsers[userId].isDocumentsSubmited,
             "The KYC process is already started by another Financial Institution. Please Wait till they verify."
         );
         require(
@@ -131,19 +132,25 @@ contract KYC {
         public
         view
         onlyInstitutions(_userId)
-        returns (string[] memory)
+        returns (string memory)
     {
-        return indexedUsers[_userId].documents;
+        return indexedUsers[_userId].documentsLocation;
     }
 
-    // The function check if the user is approved or not.  (only institution with permition)
-    function checkIsUserApproved(address _userId) public view returns (bool) {
+    // The function check if the user is approved or not. (Return - true / false) (only institution with permition)
+    function checkIsUserApproved(address _userId)
+        public
+        view
+        onlyInstitutions(_userId)
+        returns (bool)
+    {
         return indexedUsers[_userId].isApproved;
     }
 
     // The function to verify the documents, if the user is not approved (false).  (only institution with permition)
     function institutionVerifiesDocuments(address _userId, bytes32 _uprovedHash)
         public
+        onlyInstitutions(_userId)
     {
         if (indexedUsers[_userId].documentHash == _uprovedHash) {
             indexedUsers[_userId].uprovedHash = _uprovedHash;
@@ -155,16 +162,29 @@ contract KYC {
         }
     }
 
-    // The function to verify the hashs, if the user is approved (true).  (only institution with permition)
-    function institutionVerifiesHashs(address _userId) public returns (bool) {
+    // The function to verify the hashs and set the isHashsVerified, if the user is approved (true - 1).  (only institution with permition)
+    function institutionVerifiesHashs(address _userId)
+        public
+        onlyInstitutions(_userId)
+    {
         if (
             indexedUsers[_userId].documentHash ==
             indexedUsers[_userId].uprovedHash
         ) {
-            return true;
+            indexedUsers[_userId].isHashsVerified = true;
         } else {
             indexedUsers[_userId].isApproved = false;
-            return false;
+            indexedUsers[_userId].isHashsVerified = false;
         }
+    }
+
+    // The function to check if the hashs match, if the user is approved (true - 2). (Return - true (Done) / false) (only institution with permition)
+    function checkIsHashsVerified(address _userId)
+        public
+        view
+        onlyInstitutions(_userId)
+        returns (bool)
+    {
+        return indexedUsers[_userId].isHashsVerified;
     }
 }
