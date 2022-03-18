@@ -12,7 +12,7 @@ contract KYC{
         bool isDocumentsAvailable; // The boolian variable to check if there are documents available or not.
         FinancialInstitution submitedInstitution; // The institution to whihc the documents have been submited.
         bool isDocumentsSubmited; // The boolian variable to check if the documents are submited to verify or not.
-        bytes32 uprovedHash; // The hash that is uploaded by the instituion after verifying.  
+        bytes32 approvedHash; // The hash that is uploaded by the instituion after verifying.  
         bool isApproved; // The boolian variable to check if the documents are approved or not.
         bool isHashsVerified; // The boolian variable to check if the document hash and uproved hash are same.
     }
@@ -58,7 +58,6 @@ contract KYC{
         return false;
     }
 
-
     // The function to create a user account. (Anyone)
     function createUserAccount(string memory _name) public {
         address userId = msg.sender;
@@ -77,7 +76,6 @@ contract KYC{
         indexedInstitutions[institutionId].name =_name;
     }
 
-
     // The function to upload / update documens by the user. [The list of document urls and the document hash]  (only user)
     function userUploadDocuments(string memory _documentsLocation, bytes32 _documentHash) public onlyUser{
         address userId = msg.sender;
@@ -85,7 +83,6 @@ contract KYC{
         indexedUsers[userId].documentHash = _documentHash;
         indexedUsers[userId].isDocumentsAvailable = true;
     }
-
 
     // The function to give the permition to an institution, asking them to verify.  (only user)
     function userSubmitsToInstitution(address _institutionId) public onlyUser{
@@ -103,6 +100,11 @@ contract KYC{
         return indexedUsers[_userId].documentsLocation;
     }
 
+    // The function check if the user is approved or not. (Return - true / false) (only user)
+    function checkIsApproved() public view onlyUser returns(bool){
+        address userId = msg.sender;
+        return indexedUsers[userId].isApproved;
+    }
     
     // The function check if the user is approved or not. (Return - true / false) (only institution with permition)
     function checkIsUserApproved(address _userId) public view onlyInstitutions(_userId) returns(bool){
@@ -110,9 +112,9 @@ contract KYC{
     }
 
     // The function to verify the documents, if the user is not approved (false).  (only institution with permition)
-    function institutionVerifiesDocuments(address _userId, bytes32 _uprovedHash) public onlyInstitutions(_userId){
-            if(indexedUsers[_userId].documentHash == _uprovedHash){
-                indexedUsers[_userId].uprovedHash = _uprovedHash;
+    function institutionVerifiesDocuments(address _userId, bytes32 _approvedHash) public onlyInstitutions(_userId){
+            if(indexedUsers[_userId].documentHash == _approvedHash){
+                indexedUsers[_userId].approvedHash = _approvedHash;
                 indexedUsers[_userId].isApproved = true;
                 indexedUsers[_userId].isDocumentsSubmited = false;
             }else{
@@ -121,10 +123,9 @@ contract KYC{
             }
     }
 
-
     // The function to verify the hashs and set the isHashsVerified, if the user is approved (true - 1).  (only institution with permition)
     function institutionVerifiesHashs(address _userId) public onlyInstitutions(_userId){
-            if(indexedUsers[_userId].documentHash == indexedUsers[_userId].uprovedHash){
+            if(indexedUsers[_userId].documentHash == indexedUsers[_userId].approvedHash){
                indexedUsers[_userId].isHashsVerified = true;
             }else{
                 indexedUsers[_userId].isApproved = false;
