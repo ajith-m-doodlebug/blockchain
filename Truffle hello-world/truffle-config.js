@@ -21,7 +21,7 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 //
 // const fs = require('fs');
-const mnemonic = 'theme palm bread solar guitar photo shell explain depend feel mobile ensure';
+const mnemonic = ''; // Your mnemonic goes here.
 
 module.exports = {
   /**
