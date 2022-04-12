@@ -48,7 +48,7 @@ contract SupplyChain {
         uint256 productId;
         uint256 time;
         string message;
-        uint256 supplierId;
+        uint256 publisherId;
     }
 
     // To check if the user is present.
@@ -132,19 +132,21 @@ contract SupplyChain {
     function addProduct(
         address _accountAddress,
         uint256 _ownerId,
-        string memory _name,
-        uint256 _productId
+        string memory _name
     ) public onlyOwner(_accountAddress, _ownerId) {
+        uint256 productId = uint256(
+            keccak256(abi.encodePacked(block.difficulty, block.number, _name))
+        );
         accountsByAddress[_accountAddress].products.push(
-            ProductDetails(_name, _productId)
+            ProductDetails(_name, productId)
         );
         ProductStatusDeails memory productStatusDeails = ProductStatusDeails(
-            _productId,
+            productId,
             block.timestamp,
-            "message",
-            11
+            "Ordered",
+            _ownerId
         );
-        productStatus[_productId].push(productStatusDeails);
+        productStatus[productId].push(productStatusDeails);
     }
 
     // SP-1 : The function to add an supplier.
