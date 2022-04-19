@@ -67,15 +67,67 @@ contract SupplyChain {
     // The Owner Application - OA
     // The Supplier Application - SP
 
+    function isOwnerPresent(address _accountAddress, uint256 _ownerId)
+        private
+        view
+        returns (bool)
+    {
+        uint256 index = 0;
+        uint256 length = accountsByAddress[_accountAddress].owners.length;
+        while (length != 0) {
+            if (
+                accountsByAddress[_accountAddress].owners[index].ownerId ==
+                _ownerId
+            ) {
+                return true;
+            }
+            index++;
+            length--;
+        }
+        return false;
+    }
+
+    function isSupplierPresent(address _accountAddress, uint256 _supplierId)
+        private
+        view
+        returns (bool)
+    {
+        uint256 index = 0;
+        uint256 length = accountsByAddress[_accountAddress].suppliers.length;
+        while (length != 0) {
+            if (
+                accountsByAddress[_accountAddress]
+                    .suppliers[index]
+                    .supplierId == _supplierId
+            ) {
+                return true;
+            }
+            index++;
+            length--;
+        }
+        return false;
+    }
+
     // The modifier that allows only the owners to access the functions.
     modifier onlyOwner(address _accountAddress, uint256 _ownerId) {
-        //require(msg.sender == company,"Only The Company can access this function");
+        require(isOwnerPresent(_accountAddress, _ownerId), "Access Denied");
+        require(
+            block.timestamp < accountsByAddress[_accountAddress].planExpiresAt,
+            "Plan Expired"
+        );
         _;
     }
 
     // The modifier that allows only the suppliers to access the functions.
     modifier onlySupplier(address _accountAddress, uint256 _supplierId) {
-        //require(msg.sender == company,"Only The Company can access this function");
+        require(
+            isSupplierPresent(_accountAddress, _supplierId),
+            "Access Denied"
+        );
+        require(
+            block.timestamp < accountsByAddress[_accountAddress].planExpiresAt,
+            "Plan Expired"
+        );
         _;
     }
 
@@ -84,15 +136,19 @@ contract SupplyChain {
         address _accountAddress,
         string memory _name,
         uint256 _ownerId
-    ) public onlyOwner(_accountAddress, _ownerId) {
+    ) public {
         require(isAccountPresent[_accountAddress], "Invalid Account");
+        require(
+            block.timestamp < accountsByAddress[_accountAddress].planExpiresAt,
+            "Plan Expired"
+        );
         accountsByAddress[_accountAddress].owners.push(
             OwnerDetails(_name, _ownerId)
         );
     }
 
     // OA-2 : The function to get the number of products.
-    function getNoProduct(address _accountAddress, uint256 _ownerId)
+    function getNoProductOwner(address _accountAddress, uint256 _ownerId)
         public
         view
         onlyOwner(_accountAddress, _ownerId)
@@ -102,7 +158,7 @@ contract SupplyChain {
     }
 
     // OA-3 : The function to get the list of products.
-    function getProductGeneralDetails1(
+    function getProductGeneralDetailsOwner(
         address _accountAddress,
         uint256 _ownerId
     )
@@ -115,7 +171,7 @@ contract SupplyChain {
     }
 
     // OA-4 : The function to get a specific product's status details.
-    function getProductStatusDetails(
+    function getProductStatusDetailsOwner(
         address _accountAddress,
         uint256 _ownerId,
         uint256 _productId
@@ -129,7 +185,7 @@ contract SupplyChain {
     }
 
     // OA-5 : The function to add a product.
-    function addProduct(
+    function addProductOwner(
         address _accountAddress,
         uint256 _ownerId,
         string memory _name
@@ -154,15 +210,19 @@ contract SupplyChain {
         address _accountAddress,
         string memory _name,
         uint256 _supplierId
-    ) public onlySupplier(_accountAddress, _supplierId) {
+    ) public {
         require(isAccountPresent[_accountAddress], "Invalid Account");
+        require(
+            block.timestamp < accountsByAddress[_accountAddress].planExpiresAt,
+            "Plan Expired"
+        );
         accountsByAddress[_accountAddress].suppliers.push(
             SupplierDetails(_name, _supplierId)
         );
     }
 
     // OA-2 : The function to get the number of products.
-    function getNoProduct2(address _accountAddress, uint256 _supplierId)
+    function getNoProductSupplier(address _accountAddress, uint256 _supplierId)
         public
         view
         onlySupplier(_accountAddress, _supplierId)
@@ -172,7 +232,7 @@ contract SupplyChain {
     }
 
     // SP-3 : The function to get the list of products.
-    function getProductGeneralDetails2(
+    function getProductGeneralDetailsSupplier(
         address _accountAddress,
         uint256 _supplierId
     )
@@ -185,7 +245,7 @@ contract SupplyChain {
     }
 
     // SP-4 : The function to add a supply detail about the product.
-    function addProductStaus(
+    function addProductStausSupplier(
         address _accountAddress,
         uint256 _supplierId,
         string memory _message,
