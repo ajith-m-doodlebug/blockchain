@@ -5,7 +5,7 @@ This implementation is done by Ajith @ ontheether.com
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-https://github.com/ajith-m-doodlebug/blockchain/blob/main/Tokens/ERC20/ERC20.sol
+import "https://github.com/ajith-m-doodlebug/blockchain/blob/main/Tokens/ERC20/ERC20.sol";
 
 contract ERC20Factory{
 
