@@ -11,9 +11,7 @@ const initialize = () => {
     const displayNetworkId = document.getElementById('displayNetworkId');
     const displayChangesMade = document.getElementById('displayChangesMade');
 
-
     let accounts = [];
-
 
     const isMetaMaskInstalled = () => {
         const { ethereum } = window;
@@ -26,19 +24,11 @@ const initialize = () => {
             updateAll();
             sendEthButton.disabled = false;
             requestPermitionButton.disabled = false;
-            connectButton.innerText = 'Log Out';
-            connectButton.onclick = onLogOut;
         } catch (error) {
             console.error(error);
         }
     };
 
-    async function onLogOut() {
-        displayAccountAddress.innerText = '';
-        displayChainId.innerText = '';
-        displayNetworkId.innerText = '';
-        displayChangesMade.innerText = '';
-    }
 
     const onClickInstall = () => {
         connectButton.innerText = 'Onboarding in progress';
